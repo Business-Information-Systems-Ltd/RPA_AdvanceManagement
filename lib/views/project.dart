@@ -426,8 +426,8 @@ class _ProjectInfoState extends State<ProjectInfo> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Delete Confirmation"),
-            content: Text("Are you sure to delete this Project Data?"),
+            title: const Text("Delete Confirmation"),
+            content: const Text("Are you sure to delete this Project Data?"),
             actions: [
               TextButton(
                   onPressed: () {
@@ -675,6 +675,7 @@ class _ProjectInfoState extends State<ProjectInfo> {
         });
   }
 
+  // ignore: unused_element
   void _openAdvancedSearchDialog() {
     showDialog(
       context: context,
@@ -835,12 +836,15 @@ class _ProjectInfoState extends State<ProjectInfo> {
 
                 const SizedBox(
                     width: 10), // Space between search bar and filters button
+                     // Space between search bar and filters button
 
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  // label: const Text("Filters"),
-                  onPressed: _openAdvancedSearchDialog,
-                ),
+                // IconButton(
+                // IconButton(
+                //   icon: const Icon(Icons.more_vert),
+                //   // label: const Text("Filters"),
+                //   // label: const Text("Filters"),
+                //   onPressed: _openAdvancedSearchDialog,
+                // ),
 
                 // SizedBox(width: MediaQuery.of(context).size.width / 3.3),
                 SizedBox(width: 10),
@@ -888,7 +892,7 @@ class _ProjectInfoState extends State<ProjectInfo> {
                       ),
                     ],
                   ),
-                ),
+                ), 
               ],
             ),
             const SizedBox(height: 10),
@@ -968,6 +972,7 @@ class _ProjectInfoState extends State<ProjectInfo> {
                     outside: BorderSide(color: Colors.black, width: 1),
                   ),
                   columnWidths: const {
+                   
                     0: FlexColumnWidth(0.6),
                     1: FlexColumnWidth(0.7),
                     2: FlexColumnWidth(2.5),
@@ -1673,6 +1678,7 @@ class _ProjectDetailState extends State<ProjectDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     List<Map<String, String>> budgetDetails = [];
     if (widget.projectData["BudgetDetails"] != null) {
       if (widget.projectData["BudgetDetails"] is String) {
@@ -1744,7 +1750,7 @@ class _ProjectDetailState extends State<ProjectDetailPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildInlineText(label1, value1),
-          if (label2.isNotEmpty) _buildInlineText(label2, value2 ?? "N/A"),
+          if (label2.isNotEmpty) _buildInlineText(label2, value2 ?? ""),
         ],
       ),
     );
@@ -1805,6 +1811,7 @@ Widget _buildBudgetTable() {
   }
 }
 
+// ignore: unused_element
 Widget _buildTableCell(String text, {bool isHeader = false}) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
@@ -1840,3 +1847,12 @@ Widget build(BuildContext context) {
     // ),
   );
 }
+
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(
+//       title: const Text("Project Infomation"),
+//     ),
+//   );
+// }

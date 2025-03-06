@@ -1,11 +1,10 @@
-
+import 'package:advance_budget_request_system/views/advanceRequest.dart';
 import 'package:advance_budget_request_system/views/approvalsetup.dart';
-import 'package:advance_budget_request_system/views/budgetamount.dart';
-import 'package:advance_budget_request_system/views/budgetcodeview.dart';
+import 'package:advance_budget_request_system/views/budgetAmount.dart';
+import 'package:advance_budget_request_system/views/budgetcode.dart';
 import 'package:advance_budget_request_system/views/project.dart';
 import 'package:advance_budget_request_system/views/trip.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -24,11 +23,10 @@ class _DashboardState extends State<Dashboard>
   static final List<Widget> _widgetOptions = <Widget>[
     const DashboardView(),
     const Budgetcodeview(),
-    Budgetamount(),
-  
+    const Budgetamount(),
     ProjectInfo(),
     const TripInfo(),
-    const Center(child: Text("Advance Request")),
+    const Advancerequest(),
     const Center(child: Text("Cash Payment")),
     const Center(child: Text("Settlement")),
     ApprovalSetup(),
@@ -71,7 +69,7 @@ class _DashboardState extends State<Dashboard>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(100, 207, 198, 0.855),
+        backgroundColor: const Color.fromRGBO(100, 207, 198, 0.855),
         title: const Text("Advance Budget Request System"),
         leading: IconButton(
           onPressed: _toggleMenuBar,
@@ -367,8 +365,8 @@ class _DashboardViewState extends State<DashboardView> {
             child: Container(
               width: isSmallScreen ? constraints.maxWidth/0.55 : containerWidth,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                // mainAxisAlignment: MainAxisAlignment.center,
+                // crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Row(
                     children: [

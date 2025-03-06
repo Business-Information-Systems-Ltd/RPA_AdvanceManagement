@@ -108,10 +108,17 @@ packages:
     dependency: transitive
     description:
       name: http_parser
+<<<<<<< HEAD
+      sha256: "2aa08ce0341cc9b354a498388e30986515406668dbcc4f7c950c3e715496693b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.2"
+=======
       sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+>>>>>>> 898492bfb4802e860b0350aee016cea67b8c75bd
   intl:
     dependency: "direct main"
     description:
@@ -332,15 +339,26 @@ packages:
       sha256: "664d3a9a64782fcdeb83ce9c6b39e78fd2971d4e37827b9b06c3aa1edc5e760c"
       url: "https://pub.dev"
     source: hosted
+<<<<<<< HEAD
+    version: "0.7.0"
+=======
     version: "0.7.3"
+>>>>>>> 898492bfb4802e860b0350aee016cea67b8c75bd
   typed_data:
     dependency: transitive
     description:
       name: typed_data
+<<<<<<< HEAD
+      sha256: facc8d6582f16042dd49f2463ff1bd6e2c9ef9f3d5da3d9b087e244a7b564b3c
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.2"
+=======
       sha256: f9049c039ebfeb4cf7a7104a675823cd72dba8297f264b6637062516699fa006
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+>>>>>>> 898492bfb4802e860b0350aee016cea67b8c75bd
   vector_math:
     dependency: transitive
     description:
@@ -356,7 +374,11 @@ packages:
       sha256: f6be3ed8bd01289b34d679c2b62226f63c0e69f9fd2e50a6b3c1c729a961041b
       url: "https://pub.dev"
     source: hosted
+<<<<<<< HEAD
+    version: "14.2.1"
+=======
     version: "14.3.0"
+>>>>>>> 898492bfb4802e860b0350aee016cea67b8c75bd
   web:
     dependency: transitive
     description:

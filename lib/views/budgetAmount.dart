@@ -1,7 +1,3 @@
-import 'dart:math';
-
-import 'package:advance_budget_request_system/views/api_service.dart';
-import 'package:advance_budget_request_system/views/data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -13,39 +9,23 @@ class Budgetamount extends StatefulWidget {
 }
 
 class _BudgetamountState extends State<Budgetamount> {
-  
-  List<BudgetAmount> budgetamountInformation = [];
-  List<BudgetAmount> filteredBudgetAmount = [];
+  List<Map<String, dynamic>> budgetamountInformation =
+      List.generate(100, (int index) {
+    return {
+      'BudgetCode': 'B-$index',
+      'Description': 'BudgetDescription $index',
+      'InitialAmount': '0',
+      'Action': '',
+    };
+  });
+  List<Map<String, dynamic>> filteredBudgetAmount = [];
   String searchQuery = '';
+
   TextEditingController _searchingController = TextEditingController();
 
-  
-  // List<Map<String, dynamic>> filteredBudgetAmount = [];
-  Future<void> fetchBudgetAmount() async {
-    final apiService = ApiService();
-    try {
-    
-      List<BudgetAmount> data = await apiService.fetchBudgetAmount();
-      setState(() {
-        budgetamountInformation = data;
-        filteredBudgetAmount = data;
-        // if (filteredBudgetAmount.isNotEmpty) {
-        //   int maxID = filteredBudgetAmount
-        //       .map((b) => int.parse(b.BudgetCode.split('-')[2]))
-        //       .reduce((a, b) => a > b ? a : b);
-        // }
-      });
-    //  print("Fetched Budget Amount: $data");
-    } catch (e) {
-      print("Error fetching data: $e");
-    }
-  }
-
-  @override
   void initState() {
     super.initState();
-    fetchBudgetAmount();
-    // filteredBudgetAmount = List.from(budgetamountInformation);
+    filteredBudgetAmount = List.from(budgetamountInformation);
   }
 
   // Searchbarfilter fuction
@@ -54,8 +34,8 @@ class _BudgetamountState extends State<Budgetamount> {
       searchQuery = query;
       filteredBudgetAmount = budgetamountInformation
           .where((item) =>
-              item.BudgetCode!.toLowerCase().contains(query.toLowerCase()) ||
-              item.Description!.toLowerCase().contains(query.toLowerCase()))
+              item['BudgetCode'].toLowerCase().contains(query.toLowerCase()) ||
+              item['Description'].toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -160,9 +140,6 @@ class _BudgetamountState extends State<Budgetamount> {
               ],
             ),
             Expanded(
-              child:SingleChildScrollView(
-            
-              
               child: Table(
                   border: const TableBorder.symmetric(
                     inside: BorderSide(color: Colors.grey, width: 1),
@@ -180,47 +157,38 @@ class _BudgetamountState extends State<Budgetamount> {
                     return TableRow(children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(row.BudgetCode ?? '1'),
+                        child: Text(row['BudgetCode'] ?? '1'),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(row.Description ?? 'no'),
+                        child: Text(row['Description'] ?? 'no'),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(row.InitialAmount?.toString() ?? '0'),
+                        child: Text(row['InitialAmount'] ?? '0'),
                       ),
                       Row(
                         children: [
                           IconButton(
-                              onPressed: ()  {
-                                 Navigator.push(
+                              onPressed: () {
+                                print(budgetamountInformation);
+                                Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => BudgetInitialAmount(
-                                            budgetamountInformation:
-                                                budgetamountInformation[index],
-                                           OnBudgetAmountUpdated: (AddInitialAmount) {
-                                              setState(() {
-                                                int index = budgetamountInformation
-                                                    .indexWhere((element) =>
-                                                        element.id ==
-                                                        AddInitialAmount.id);
-
-                                                if (index != -1) {
-                                                  budgetamountInformation[index] =
-                                                      AddInitialAmount;
-                                                         
-                                                _refreshbudgetamountTable();
-                                                } else {
-                                                  print(
-                                                      "Error: Budget code not found in the list.");
-                                                }
-
-                          
-                                              });
-                                            })));
-
+                                        builder: (context) =>
+                                            BudgetInitialAmount(
+                                                budgetamountInformation:
+                                                    budgetamountInformation[
+                                                        index],
+                                                OnBudgetAmountUpdated:
+                                                    (UpdatedInitialAmount) {
+                                                  setState(() {
+                                                    _refreshbudgetamountTable();
+                                                    budgetamountInformation[
+                                                            index] =
+                                                        UpdatedInitialAmount;
+                                                  });
+                                                })));
                               },
                               icon: Icon(
                                 Icons.input,
@@ -237,7 +205,6 @@ class _BudgetamountState extends State<Budgetamount> {
                     ]);
                   }).toList()),
             )
-            )
           ],
         ),
       ),
@@ -246,18 +213,12 @@ class _BudgetamountState extends State<Budgetamount> {
 }
 
 class BudgetInitialAmount extends StatefulWidget {
-
- //  final Map<String, dynamic> budgetamountInformation;
-   
-   final BudgetAmount budgetamountInformation;
-  //final Function(Map<String, dynamic>) OnBudgetAmountUpdated;
-   final Function(BudgetAmount) OnBudgetAmountUpdated;
-
-
+  final Map<String, dynamic> budgetamountInformation;
+  final Function(Map<String, dynamic>) OnBudgetAmountUpdated;
 
   const BudgetInitialAmount(
       {Key? key,
-       required this.budgetamountInformation,
+      required this.budgetamountInformation,
       required this.OnBudgetAmountUpdated})
       : super(key: key);
 
@@ -267,59 +228,30 @@ class BudgetInitialAmount extends StatefulWidget {
 
 class _BudgetInitialAmountState extends State<BudgetInitialAmount> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _budgetCodeController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _initialamountController =TextEditingController();
-  final ApiService apiService = ApiService();
-   String generateBudgetAmountID(int length) {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    Random rnd = Random();
-    return length > 0
-        ? List.generate(length, (_) => chars[rnd.nextInt(chars.length)]).join()
-        : '0000';
-  }
-
-  
-
-
+  final TextEditingController _initialamountController =
+      TextEditingController();
 
   void initState() {
     super.initState();
-    _budgetCodeController.text = widget.budgetamountInformation.BudgetCode?? ''; 
-    _descriptionController.text = widget.budgetamountInformation.Description?? ''; 
-    _initialamountController.text = widget.budgetamountInformation.InitialAmount?.toString() ?? '';
+    _budgetCodeController.text = widget.budgetamountInformation['BudgetCode'];
+    _descriptionController.text = widget.budgetamountInformation['Description'];
+    _initialamountController.text =
+        widget.budgetamountInformation['InitialAmount'];
   }
 
-  void _submitInitialAmount()  async {
+  void _submitInitialAmount() {
     if (_formKey.currentState!.validate()) {
-      BudgetAmount AddInitialAmount = BudgetAmount(
-        id: widget.budgetamountInformation.id,
-        BudgetCode:_budgetCodeController.text, 
-        Description: _descriptionController.text,
-        InitialAmount:  int .tryParse(_initialamountController.text));
+      Map<String, dynamic> UpdatedInitialAmount = {
+        'BudgetCode': _budgetCodeController.text,
+        'Description': _descriptionController.text,
+        'InitialAmount': _initialamountController.text,
+      };
 
-        try{
-           bool isSuccess = await apiService.updateBudgetAmount(AddInitialAmount);
-        if (isSuccess) {
-          widget.OnBudgetAmountUpdated(AddInitialAmount);
-          Navigator.pop(context);
-        }
-
-        }
-        catch(e){
-          ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to add BudgetAmount: $e")),
-        );
-
-        }
-      // {
-      //   'BudgetCode': _budgetCodeController.text,
-      //   'Description': _descriptionController.text,
-      //   'InitialAmount': _initialamountController.text,
-      // };
-
-      // widget.OnBudgetAmountUpdated(UpdatedInitialAmount);
-      // Navigator.pop(context);
+      widget.OnBudgetAmountUpdated(UpdatedInitialAmount);
+      Navigator.pop(context);
     }
   }
 
