@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProjectEntry extends StatefulWidget {
   const ProjectEntry({super.key});
@@ -35,31 +38,26 @@ class _EntryFormState extends State<EntryForm> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController dateController = TextEditingController(
       text: DateFormat('yyyy-MM-dd').format(DateTime.now()));
-
+int lastProjectNumber =0;
   List<Map<String, dynamic>> chooseBudgetCodes = [];
   final List<Map<String, dynamic>> BudgetDetails = [
     {'Budget Code': 'B001', 'Description': 'Marketing Campaign'},
     {'Budget Code': 'B002', 'Description': 'Short Trip'},
     {'Budget Code': 'B003', 'Description': 'Foreign Trip'},
     {'Budget Code': 'B004', 'Description': 'On Job Training'},
-    {'Budget Code': 'B005', 'Description': 'On Job Training'},
-    {'Budget Code': 'B006', 'Description': 'On Job Training'},
-    {'Budget Code': 'B007', 'Description': 'On Job Training'},
-    {'Budget Code': 'B008', 'Description': 'On Job Training'},
-    {'Budget Code': 'B009', 'Description': 'On Job Training'},
-    {'Budget Code': 'B004', 'Description': 'On Job Training'},
-    {'Budget Code': 'B004', 'Description': 'On Job Training'},
-    {'Budget Code': 'B004', 'Description': 'On Job Training'},
-    {'Budget Code': 'B004', 'Description': 'On Job Training'},
-    {'Budget Code': 'B004', 'Description': 'On Job Training'},
+    {'Budget Code': 'B005', 'Description': 'Team Building'},
+    {'Budget Code': 'B006', 'Description': 'Software Purchase'},
+    {'Budget Code': 'B007', 'Description': 'New Equipment'},
+    {'Budget Code': 'B008', 'Description': 'Annual Conference'},
+    {'Budget Code': 'B009', 'Description': 'Miscellaneous'}, 
   ];
- Map<String, String> getBudgetDetail(String code) {
-    final budget = BudgetDetails.firstWhere(
-      (item) => item['Budget Code'] == code,
-      orElse: () => {'Budget Code': 'N/A', 'Description': 'No budget details available'},
-    );
-    return {'code': budget['Budget Code']!, 'description': budget['Description']!};
-  }
+//  Map<String, String> getBudgetDetail(String code) {
+//     final budget = BudgetDetails.firstWhere(
+//       (item) => item['Budget Code'] == code,
+//       orElse: () => {'Budget Code': 'N/A', 'Description': 'No budget details available'},
+//     );
+//     return {'code': budget['Budget Code']!, 'description': budget['Description']!};
+//   }
   //Budget Alert Dialog
 //Budget Alert Dialog
   void _showBudgetCodeDialog() {
@@ -176,7 +174,7 @@ class _EntryFormState extends State<EntryForm> {
   }
 
   String? _selectedDepartment;
-  String? selectedBudgetCode;
+  //String? selectedBudgetCode;
   String _selectedCurrency = "MMK";
   //String? _selectedRequestable='No';
   final List<String> _departments = [
@@ -203,25 +201,60 @@ class _EntryFormState extends State<EntryForm> {
     });
   }
 
-  void _submitForm() {
+
+
+@override
+  void initState() {
+    super.initState();
+_initializeProjectCode();  }
+Future<void> _initializeProjectCode() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      lastProjectNumber = prefs.getInt('lastProjectNumber') ?? 0;
+      projectController.text = _generateProjectCode(lastProjectNumber + 1);
+    });
+  }
+
+  /// Generate a new project code based on the lastProjectNumber
+  String _generateProjectCode(int number) {
+    return 'PRJ-000-${number.toString().padLeft(3, '0')}';
+  }
+
+  /// Save the updated last project number
+  Future<void> _saveLastProjectNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('lastProjectNumber', lastProjectNumber);
+  }
+  
+
+  void _submitForm() async {
     if (_formkey.currentState!.validate()) {
+      lastProjectNumber++; // Increment the last used project number
+      await _saveLastProjectNumber();
       List<Map<String, dynamic>> newProject = [
         {
+
           "Date": dateController.text,
+           // "ProjectID": projectCode,
           "ProjectID": projectController.text,
           "Description": desciptionController.text,
           "Total Budget Amount": amountController.text,
           "Currency": _selectedCurrency,
           "Department": _selectedDepartment ?? '',
           "Requestable": 'No',
-          "Budget Code": chooseBudgetCodes.isNotEmpty 
-                        ? chooseBudgetCodes.map((e) => e['Budget Code']).join(",")
-                        : '',
-
+          // "Budget Code": chooseBudgetCodes.isNotEmpty 
+          //               ? chooseBudgetCodes.map((e) => e['Budget Code']).join(",")
+          //               : '',
+          'BudgetDetails': jsonEncode(chooseBudgetCodes),
         }
       ];
 
       widget.onProjectAdded(newProject);
+      // String newCode = await generateProjectCode();
+       
+      setState(() {
+        projectController.text =  _generateProjectCode(lastProjectNumber + 1);
+      });
 
       Navigator.pop(context);
     }
@@ -232,6 +265,7 @@ class _EntryFormState extends State<EntryForm> {
       filterData.addAll(newProjects); // Ensure newProjects is a list
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -279,8 +313,11 @@ class _EntryFormState extends State<EntryForm> {
                                 ListTile(
                                   title: TextFormField(
                                     controller: projectController,
+                                    readOnly: true,
                                     decoration: const InputDecoration(
-                                        labelText: "Enter Project Code"),
+                                        labelText: "Enter Project Code"
+                                       ),
+                                        
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return "Enter Project Code";
@@ -499,252 +536,4 @@ class _EntryFormState extends State<EntryForm> {
   }
 }
 
-class ProjectBudgetEntry extends StatefulWidget {
-  @override
-  _ProjectBudgetEntryFormState createState() => _ProjectBudgetEntryFormState();
-}
 
-class _ProjectBudgetEntryFormState extends State<ProjectBudgetEntry> {
-  List<Map<String, String>> budgetData = [
-    {"Budget Code": "", "Description": ""}
-  ]; // First row is always there
-
-  // Dummy budget selection data
-  final List<Map<String, String>> availableBudgetCodes = [
-    {"Budget Code": "B001", "Description": "Marketing Expenses"},
-    {"Budget Code": "B002", "Description": "Travel Expenses"},
-    {"Budget Code": "B003", "Description": "Office Supplies"},
-  ];
-
-  void _showBudgetSelectionDialog(int rowIndex) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Select Budget Code"),
-          content: Container(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Table(
-                  border: TableBorder.all(),
-                  columnWidths: {0: FlexColumnWidth(1), 1: FlexColumnWidth(2)},
-                  children: [
-                    TableRow(
-                      decoration: BoxDecoration(color: Colors.grey[300]),
-                      children: [
-                        _buildTableCell("Budget Code", isHeader: true),
-                        _buildTableCell("Description", isHeader: true),
-                      ],
-                    ),
-                    for (var budget in availableBudgetCodes)
-                      TableRow(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                budgetData[rowIndex] = {
-                                  "Budget Code": budget["Budget Code"]!,
-                                  "Description": budget["Description"]!
-                                };
-
-                                if (rowIndex == budgetData.length - 1) {
-                                  budgetData.add(
-                                      {"Budget Code": "", "Description": ""});
-                                }
-                              });
-                              Navigator.pop(context);
-                            },
-                            child: _buildTableCell(budget["Budget Code"] ?? ""),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                budgetData[rowIndex] = {
-                                  "Budget Code": budget["Budget Code"]!,
-                                  "Description": budget["Description"]!
-                                };
-
-                                if (rowIndex == budgetData.length - 1) {
-                                  budgetData.add(
-                                      {"Budget Code": "", "Description": ""});
-                                }
-                              });
-                              Navigator.pop(context);
-                            },
-                            child: _buildTableCell(budget["Description"] ?? ""),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _deleteRow(int index) {
-    setState(() {
-      if (index == 0) {
-        // First row can't be removed, only cleared
-        budgetData[index] = {"Budget Code": "", "Description": ""};
-      } else {
-        budgetData.removeAt(index);
-      }
-    });
-  }
-
-  void _submitProject() {
-    List<Map<String, String>> selectedBudgetData =
-        budgetData.where((row) => row["Budget Code"]!.isNotEmpty).toList();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            ProjectDetailScreen(budgetData: selectedBudgetData),
-      ),
-    );
-  }
-
-  Widget _buildTableCell(String text, {bool isHeader = false}) {
-    return Padding(
-      padding: EdgeInsets.all(8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Project Entry Form")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Select Budget Codes",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Table(
-              border: TableBorder.all(),
-              columnWidths: {
-                0: FlexColumnWidth(1),
-                1: FlexColumnWidth(2),
-                2: FlexColumnWidth(1)
-              },
-              children: [
-                TableRow(
-                  decoration: BoxDecoration(color: Colors.grey[300]),
-                  children: [
-                    _buildTableCell("Budget Code", isHeader: true),
-                    _buildTableCell("Description", isHeader: true),
-                    _buildTableCell("Action", isHeader: true),
-                  ],
-                ),
-                for (int i = 0; i < budgetData.length; i++)
-                  TableRow(
-                    children: [
-                      GestureDetector(
-                        onTap: () => _showBudgetSelectionDialog(i),
-                        child:
-                            _buildTableCell(budgetData[i]["Budget Code"] ?? ""),
-                      ),
-                      GestureDetector(
-                        onTap: () => _showBudgetSelectionDialog(i),
-                        child:
-                            _buildTableCell(budgetData[i]["Description"] ?? ""),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: i == 0
-                            ? SizedBox.shrink()
-                            : IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _deleteRow(i),
-                              ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitProject,
-                child: Text("Submit"),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ProjectDetailScreen extends StatelessWidget {
-  final List<Map<String, String>> budgetData;
-
-  ProjectDetailScreen({required this.budgetData});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Project Details")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Selected Budget Details",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Table(
-              border: TableBorder.all(),
-              columnWidths: {0: FlexColumnWidth(1), 1: FlexColumnWidth(2)},
-              children: [
-                TableRow(
-                  decoration: BoxDecoration(color: Colors.grey[300]),
-                  children: [
-                    _buildTableCell("Budget Code", isHeader: true),
-                    _buildTableCell("Description", isHeader: true),
-                  ],
-                ),
-                for (var row in budgetData)
-                  TableRow(
-                    children: [
-                      _buildTableCell(row["Budget Code"] ?? ""),
-                      _buildTableCell(row["Description"] ?? ""),
-                    ],
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTableCell(String text, {bool isHeader = false}) {
-    return Padding(
-      padding: EdgeInsets.all(8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-}

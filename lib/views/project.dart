@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:advance_budget_request_system/views/projectEntry.dart';
@@ -24,11 +25,14 @@ class _ProjectInfoState extends State<ProjectInfo> {
   final numberFormat = NumberFormat("#,##0");
 
   String? sortColumn;
-  bool isAscending = true;
+  bool sortAscending = true;
   List<Map<String, dynamic>> filterData = [];
   String searchQuery = '';
 
-  Set<String> selectedBudgetCodes = {};
+  final List<Map<String, dynamic>> chooseBudgetCodes = [];
+  // String selectedBudgetCode = "";
+  // List<String> selectedBudgetCodes = [];
+  //Set<String> selectedBudgetCodes = {};
 
   List<String> selectedFilters = [];
   List<Map<String, dynamic>> projectData = [
@@ -41,8 +45,8 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Department': 'IT',
       'Requestable': 'Yes',
       "BudgetDetails": [
-        {"Budget Code": "B0001", "Description": "For Marketing"},
-        {"Budget Code": "B11123", "Description": "Expenses"},
+       {'Budget Code': 'B001', 'Description': 'Marketing Campaign'},
+    {'Budget Code': 'B002', 'Description': 'Short Trip'},
       ],
     },
     {
@@ -54,8 +58,9 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Department': 'IT',
       'Requestable': 'Yes',
       "BudgetDetails": [
-        {"Budget Code": "B0001", "Description": "For Marketing"},
-        {"Budget Code": "B11123", "Description": "Expenses"},
+        {'Budget Code': 'B004', 'Description': 'On Job Training'},
+    {'Budget Code': 'B005', 'Description': 'Team Building'},
+
       ],
     },
     {
@@ -79,6 +84,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -88,6 +97,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'USD', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -97,6 +110,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK',
       'Department': 'Admin', // 'Approved Amount': '60,000 MMK',''
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -106,6 +123,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'HR',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -115,6 +136,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'Marketing',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -124,6 +149,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'USD', // 'Approved Amount': '60,000 MMK',''
       'Department': 'Finance',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -133,6 +162,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'HR',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -142,6 +175,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -151,6 +188,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'No',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -160,6 +201,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'No',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -169,6 +214,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'Admin',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -178,6 +227,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -187,6 +240,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -196,6 +253,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'USD', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -205,6 +266,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'No',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -214,6 +279,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -223,6 +292,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -232,6 +305,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'No',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
     {
       'Date': '2025-02-01',
@@ -241,7 +318,23 @@ class _ProjectInfoState extends State<ProjectInfo> {
       'Currency': 'MMK', // 'Approved Amount': '60,000 MMK',''
       'Department': 'IT',
       'Requestable': 'Yes',
+      "BudgetDetails": [
+        {"Budget Code": "B2001", "Description": "IT Equipment"},
+        {"Budget Code": "B21123", "Description": "Maintenance"},
+      ],
     },
+  ];
+
+  final List<Map<String, dynamic>> BudgetDetails = [
+    {'Budget Code': 'B001', 'Description': 'Marketing Campaign'},
+    {'Budget Code': 'B002', 'Description': 'Short Trip'},
+    {'Budget Code': 'B003', 'Description': 'Foreign Trip'},
+    {'Budget Code': 'B004', 'Description': 'On Job Training'},
+    {'Budget Code': 'B005', 'Description': 'Team Building'},
+    {'Budget Code': 'B006', 'Description': 'Software Purchase'},
+    {'Budget Code': 'B007', 'Description': 'New Equipment'},
+    {'Budget Code': 'B008', 'Description': 'Annual Conference'},
+    {'Budget Code': 'B009', 'Description': 'Miscellaneous'},
   ];
 
   // ignore: unused_element
@@ -256,9 +349,75 @@ class _ProjectInfoState extends State<ProjectInfo> {
     setState(() {
       _searchController.clear();
       selectedDateRange = null;
+      selectedDate=null;
       startDate = null;
       endDate = null;
       filterData = projectData;
+    });
+  }
+  void _sortDataColumn(String column) {
+    setState(() {
+      if (sortColumn == column) {
+        sortAscending = !sortAscending;
+      } else {
+        sortColumn = column;
+        sortAscending = true;
+      }
+
+      filterData.sort((a, b) {
+        final aValue = a[column];
+        final bValue = b[column];
+        if (aValue == null || bValue == null) return 0;
+
+        if (sortAscending) {
+          return aValue.compareTo(bValue);
+        } else {
+          return bValue.compareTo(aValue);
+        }
+      });
+    });
+  }
+
+  Widget _buildHeaderCell(String label, String column) {
+    return InkWell(
+      onTap: () {
+        _sortDataColumn(column);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            if (sortColumn == column)
+              Icon(
+                sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                size: 16,
+              )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _searchData(String query) {
+    setState(() {
+      List<Map<String, dynamic>> sourceData = projectData;
+      filterData = sourceData.where((Map<String, dynamic> data) {
+        final tripID = data['ProjectID'].toLowerCase();
+        final description = data['Description'].toLowerCase();
+        final totalAmt = data['Total Budget Amount'];
+        final currency = data['Currency'].toLowerCase();
+        final department = data['Department'].toLowerCase();
+        final requestable = data['Requestable'].toLowerCase();
+        final String searchLower = query.toLowerCase();
+
+        return tripID.contains(searchLower) ||
+            description.contains(searchLower) ||
+            totalAmt.contains(searchLower) ||
+            currency.contains(searchLower) ||
+            department.contains(searchLower) ||
+            requestable.contains(searchLower);
+      }).toList();
     });
   }
 
@@ -554,24 +713,6 @@ class _ProjectInfoState extends State<ProjectInfo> {
   }
 
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> getBudgetDetails() {
-  return [
-    {'Budget Code': 'B001', 'Description': 'Marketing Campaign'},
-    {'Budget Code': 'B002', 'Description': 'Short Trip'},
-    {'Budget Code': 'B003', 'Description': 'Foreign Trip'},
-    {'Budget Code': 'B004', 'Description': 'On Job Training'},
-  ];
-}
-    // {
-    //   'Project Code': 'PRJ-2324-001',
-    //   'Description': 'Final Project',
-    //   'Department': 'IT',
-    //   'Total Budget Amount': '100,000 ',
-    //  'Currency':'MMK', // 'Approved Amount': '60,000 MMK',''
-    //   // 'Status': 'Active',
-    //   'Requestable': 'Yes',
-    // },
-
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -584,7 +725,7 @@ class _ProjectInfoState extends State<ProjectInfo> {
           //mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
@@ -636,95 +777,82 @@ class _ProjectInfoState extends State<ProjectInfo> {
                         });
                       }),
                 ),
-                const SizedBox(
-                  width: 20,
-                ),
-                // SizedBox(
-                //   height: 40,
-                //   width: MediaQuery.of(context).size.width / 2,
-                //   child: SearchBar(
-                //     onChanged: _searchFilter,
-                //     leading: Icon(Icons.search),
-                //     hintText: "Search",
-                //   ),
-                // ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Container(
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.search, color: Colors.black),
-                          onPressed: () {
-                            _filterTable(_searchController.text);
-                          },
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: (query) {
-                              _filterTable(query);
-                            },
-                            // textDirection: TextDirection.LTR,
-                            textAlign: TextAlign.start,
-                            decoration: const InputDecoration(
-                              hintText: "Search",
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(8.0),
-                              isCollapsed: true,
-                            ),
+                
+                const SizedBox(width: 30),
+                Container(
+                  width: MediaQuery.of(context).size.width *0.4, 
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.search, color: Colors.black),
+                        onPressed: () {
+                          _filterTable(_searchController.text);
+                        },
+                      ),
+                      Expanded(
+                  
+                        child: TextField(
+                          
+                          controller: _searchController,
+                          onChanged: _searchData,
+                         
+                          textAlign: TextAlign.start,
+                          decoration: const InputDecoration(
+                            hintText: "Search",
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(8.0),
+                            isCollapsed: true,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          alignment: WrapAlignment.start,
-                          spacing: 8.0,
-                          runSpacing: 4.0,
-                          children: selectedFilters.map((filter) {
-                            return Chip(
-                              label: Text(filter),
-                              backgroundColor: Colors.blue.shade100,
-                              deleteIcon: const Icon(Icons.close,
-                                  size: 18, color: Colors.red),
-                              onDeleted: () => _removeFilter(filter),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        alignment: WrapAlignment.start,
+                        spacing: 8.0,
+                        runSpacing: 4.0,
+                        children: selectedFilters.map((filter) {
+                          return Chip(
+                            label: Text(filter),
+                            backgroundColor: Colors.blue.shade100,
+                            deleteIcon: const Icon(Icons.close,
+                                size: 18, color: Colors.red),
+                            onDeleted: () => _removeFilter(filter),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                 ),
 
                 // 🏷️ Wrap for Filters
 
                 const SizedBox(
-                    width: 30), // Space between search bar and filters button
+                    width: 10), // Space between search bar and filters button
 
-                ElevatedButton.icon(
+                IconButton(
                   icon: const Icon(Icons.more_vert),
-                  label: const Text("Filters"),
+                  // label: const Text("Filters"),
                   onPressed: _openAdvancedSearchDialog,
                 ),
 
-                SizedBox(width: MediaQuery.of(context).size.width / 3.3),
-
+                // SizedBox(width: MediaQuery.of(context).size.width / 3.3),
+                SizedBox(width: 10),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 150, 212, 234),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.greenAccent),
+                    borderRadius: BorderRadius.circular(10),
+                   // border: Border.all(color: Colors.greenAccent),
                   ),
                   child: Row(
-                    // mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.add, color: Colors.black),
@@ -775,61 +903,51 @@ class _ProjectInfoState extends State<ProjectInfo> {
                       outside: BorderSide(color: Colors.grey, width: 1),
                     ),
                     columnWidths: const {
-                      0: FlexColumnWidth(0.7),
-                      1: FlexColumnWidth(0.8),
+                      0: FlexColumnWidth(0.6),
+                      1: FlexColumnWidth(0.7),
                       2: FlexColumnWidth(2.5),
-                      3: FlexColumnWidth(1.3),
+                      3: FlexColumnWidth(1.0),
                       4: FlexColumnWidth(0.5),
-                      5: FlexColumnWidth(0.5),
-                      6: FlexColumnWidth(0.6),
+                      5: FlexColumnWidth(0.7),
+                      6: FlexColumnWidth(0.7),
                       7: FlexColumnWidth(0.8),
-                      8: FlexColumnWidth(0.8),
+                     // 8: FlexColumnWidth(0.8),
                     },
-                    children: const [
+                    children:  [
                       TableRow(
                         decoration: BoxDecoration(
                             color: Color.fromARGB(255, 167, 230, 232)),
                         children: [
                           Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("Date",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            child:  _buildHeaderCell("Date","Date",),
+                             
                           ),
                           Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("ProjectID",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                               child:  _buildHeaderCell("ProjectID","ProjectID",),
                           ),
                           Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("Description",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                               child:  _buildHeaderCell("Description","Description",),
                           ),
                           Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("Total Budget Amount",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                                child:  _buildHeaderCell("Total Budget Amount","Total Budget Amount",),
                           ),
                           Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("Currency",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                           child:  _buildHeaderCell("Currency","Currency",),
                           ),
                           Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("Department",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            child:  _buildHeaderCell("Department","Department",),
                           ),
                           Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text("Requestable",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            child:  _buildHeaderCell("Requestable","Requestable",),
                           ),
-                          Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("Budget code",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                          ),
+                         
                           Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text("Action",
@@ -850,15 +968,15 @@ class _ProjectInfoState extends State<ProjectInfo> {
                     outside: BorderSide(color: Colors.black, width: 1),
                   ),
                   columnWidths: const {
-                    0: FlexColumnWidth(0.7),
-                    1: FlexColumnWidth(0.8),
+                    0: FlexColumnWidth(0.6),
+                    1: FlexColumnWidth(0.7),
                     2: FlexColumnWidth(2.5),
-                    3: FlexColumnWidth(1.3),
+                    3: FlexColumnWidth(1.0),
                     4: FlexColumnWidth(0.5),
-                    5: FlexColumnWidth(0.5),
-                    6: FlexColumnWidth(0.6),
+                    5: FlexColumnWidth(0.7),
+                    6: FlexColumnWidth(0.7),
                     7: FlexColumnWidth(0.8),
-                    8: FlexColumnWidth(0.8),
+                   // 8: FlexColumnWidth(0.8),
                   },
                   children: filterData.asMap().entries.map(
                     (entry) {
@@ -873,7 +991,7 @@ class _ProjectInfoState extends State<ProjectInfo> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(row['ProjectID'] ?? '1'),
+                            child: Text(row['ProjectID'] ?? ''),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -889,16 +1007,13 @@ class _ProjectInfoState extends State<ProjectInfo> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(row['Department'] ?? 'HR'),
+                            child: Text(row['Department'] ?? ''),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(row['Requestable'] ?? 'Pending'),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(row['Budget Code'] ?? ''),
-                          ),
+                         
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -913,6 +1028,7 @@ class _ProjectInfoState extends State<ProjectInfo> {
                                             projectData: projectData[index],
                                             onProjectUpdated: (updatedProject) {
                                               setState(() {
+                                                _ProjectDetailState();
                                                 _refreshData();
                                                 projectData[index] =
                                                     updatedProject;
@@ -931,37 +1047,23 @@ class _ProjectInfoState extends State<ProjectInfo> {
                                     },
                                     icon: const Icon(Icons.delete),
                                     color: Colors.black),
+                               
                                 IconButton(
-                                  icon: const Icon(Icons.more_horiz_outlined,
-                                      color: Colors.black),
-                                  // onPressed: () {
-                                      
-                                  //   print("Details for ${row["Project Code"]}");
-                                  //   Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //       builder: (context) => ProjectDetailPage(projectData[index])));
-                                  // },
-
-                                  onPressed: () {
-  Map<String, dynamic> selectedProject = projectData[index];
-
-  selectedProject["BudgetDetails"] = getBudgetDetails()
-      .where((budget) =>
-          budget["Budget Code"] == selectedProject["Budget Code"])
-      .toList();
-
-  print("Updated Project Data: $selectedProject"); // Debug print
-
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ProjectDetailPage(selectedProject),
-    ),
-  );
-},
-
-                                ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ProjectDetailPage(projectData: projectData[index],
+                                         selectedBudgetCodes: [],
+                                          selectedBudgetCode: '', 
+                                          budgetDetails: [], 
+                                        ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.more_horiz_outlined),
+                              color: Colors.black),
                               ],
                             ),
                           ),
@@ -997,6 +1099,18 @@ class _EditProjectState extends State<EditProject> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+ List<Map<String, dynamic>> chooseBudgetCodes = [];
+  final List<Map<String, dynamic>> BudgetDetails = [
+    {'Budget Code': 'B001', 'Description': 'Marketing Campaign'},
+    {'Budget Code': 'B002', 'Description': 'Short Trip'},
+    {'Budget Code': 'B003', 'Description': 'Foreign Trip'},
+    {'Budget Code': 'B004', 'Description': 'On Job Training'},
+    {'Budget Code': 'B005', 'Description': 'Team Building'},
+    {'Budget Code': 'B006', 'Description': 'Software Purchase'},
+    {'Budget Code': 'B007', 'Description': 'New Equipment'},
+    {'Budget Code': 'B008', 'Description': 'Annual Conference'},
+    {'Budget Code': 'B009', 'Description': 'Miscellaneous'},
+  ];
 
   String _selectedCurrency = 'MMK';
   final List<String> departments = [
@@ -1020,6 +1134,14 @@ class _EditProjectState extends State<EditProject> {
     _selectedCurrency = widget.projectData['Currency'];
     _selectedDepartment = widget.projectData['Department'];
     dateController.text = widget.projectData['Date'];
+    if (widget.projectData['BudgetDetails'] is String) {
+      chooseBudgetCodes = List<Map<String, dynamic>>.from(
+          jsonDecode(widget.projectData['BudgetDetails']));
+    } else {
+      chooseBudgetCodes =
+          List<Map<String, dynamic>>.from(widget.projectData['BudgetDetails']);
+    }
+
   }
 
   void _submitForm() {
@@ -1032,7 +1154,8 @@ class _EditProjectState extends State<EditProject> {
         'Currency': _selectedCurrency,
         'Department': _selectedDepartment ?? '',
         'Requestable':
-            widget.projectData['Requestable'], // Keep the existing status
+            widget.projectData['Requestable'],
+            'BudgetDetails': jsonEncode(chooseBudgetCodes), // Keep the existing status
       };
 
       widget.onProjectUpdated(updatedProject);
@@ -1050,13 +1173,127 @@ class _EditProjectState extends State<EditProject> {
     });
   }
 
+void _showBudgetCodeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 20.0, left: 16.0, right: 16.0, bottom: 16.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Select Budget Code",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.35,
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: SingleChildScrollView(
+                          child: DataTable(
+                            showCheckboxColumn: false,
+                            columns: const [
+                              DataColumn(label: Text("")),
+                              DataColumn(label: Text("Budget Code")),
+                              DataColumn(label: Text("Description")),
+                            ],
+                            rows: BudgetDetails.map((budgetCode) {
+                              bool isSelected = chooseBudgetCodes.any((code) =>
+                                  code['Budget Code'] ==
+                                  budgetCode['Budget Code']);
+
+                              return DataRow(
+                                cells: [
+                                  DataCell(
+                                    isSelected
+                                        ? IconButton(
+                                            icon: const Icon(Icons.check_circle,
+                                                color: Colors.green),
+                                            onPressed: () {
+                                              setState(() {
+                                                chooseBudgetCodes.removeWhere(
+                                                    (code) =>
+                                                        code['Budget Code'] ==
+                                                        budgetCode[
+                                                            'Budget Code']);
+                                              });
+                                              Navigator.pop(context);
+                                              _showBudgetCodeDialog();
+                                            },
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                  DataCell(Text(budgetCode['Budget Code'])),
+                                  DataCell(Text(budgetCode['Description'])),
+                                ],
+                                onSelectChanged: (selected) {
+                                  if (selected != null && selected) {
+                                    if (isSelected) {
+                                      // Show error message if the budget code is already selected
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "This budget code is already selected."),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    } else {
+                                      setState(() {
+                                        chooseBudgetCodes.add(budgetCode);
+                                      });
+                                      Navigator.pop(context);
+                                    }
+                                  }
+                                },
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: const Icon(Icons.cancel_outlined, color: Colors.black),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _deleteBudgetCode(int index) {
+   
+    if (index >= 0 && index < chooseBudgetCodes.length) {
+    setState(() {
+      chooseBudgetCodes.removeAt(index);
+    });
+  }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Project Request"),
       ),
-      body: Center(
+      body:Center(
         child: Container(
           color: const Color.fromARGB(255, 103, 207, 177),
           width: MediaQuery.of(context).size.width * 0.5,
@@ -1080,102 +1317,174 @@ class _EditProjectState extends State<EditProject> {
                             ),
                           ),
                         ),
-                        ListTile(
-                          title: TextFormField(
-                            controller: _projectController,
-                            decoration: const InputDecoration(
-                                labelText: "Enter Project Code"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Enter Project Code";
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: TextFormField(
-                            controller: _descriptionController,
-                            decoration: const InputDecoration(
-                                labelText: "Enter Project Description"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Enter Project Description";
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: TextFormField(
-                            controller: _amountController,
-                            decoration: const InputDecoration(
-                              labelText: "Enter Total Amount",
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    title: TextFormField(
+                                      readOnly: true,
+                                      controller: _projectController,
+                                      decoration: const InputDecoration(
+                                          labelText: "Enter Project Code"),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Enter Project Code";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                  ListTile(
+                                    title: TextFormField(
+                                      controller: _descriptionController,
+                                      decoration: const InputDecoration(
+                                          labelText: "Enter Project Description"),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Enter Project Description";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                  ListTile(
+                                    title: TextFormField(
+                                      controller: _amountController,
+                                      decoration: const InputDecoration(
+                                        labelText: "Enter Total Amount",
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d*\.?\d*')),
+                                      ],
+                                      validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                          return "Enter Total Amount";
+                                        }
+                                        final amount = double.tryParse(value);
+                                        if (amount == null) {
+                                          return "Enter a valid amount";
+                                        }
+                                        if (amount <= 0) {
+                                          return "Your Request Amount must be greater than 0";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d*')),
+                            Expanded(
+                                child: Column(
+                              children: [
+                                ListTile(
+                                  title: TextFormField(
+                                    controller: dateController,
+                                    decoration: const InputDecoration(
+                                        labelText: "Request Date"),
+                                    readOnly: true,
+                                  ),
+                                ),
+                                ListTile(
+                                  title: DropdownButtonFormField(
+                                    decoration: const InputDecoration(),
+                                    value: _selectedCurrency,
+                                    items: ['MMK', 'USD'].map((currency) {
+                                      return DropdownMenuItem(
+                                          value: currency,
+                                          child: Text(currency));
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedCurrency = value!;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                ListTile(
+                                  title: DropdownButtonFormField(
+                                    decoration: const InputDecoration(
+                                      labelText: "Choose your Department",
+                                    ),
+                                    value: _selectedDepartment,
+                                    items: departments.map((department) {
+                                      return DropdownMenuItem(
+                                          value: department,
+                                          child: Text(department));
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedDepartment = value!;
+                                      });
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Choose your Department";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )),
+                          ],
+                        ),
+                       
+                         Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: _showBudgetCodeDialog,
+                                  style: ElevatedButton.styleFrom(
+                                    textStyle: const TextStyle(fontSize: 15),
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.black,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text("Add Budget Code")),
+                              const SizedBox(height: 10),
+                              Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.3,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: DataTable(
+                                    border: TableBorder.all(),
+                                    showCheckboxColumn: false,
+                                    columns: const [
+                                      DataColumn(label: Text("Budget Code")),
+                                      DataColumn(label: Text("Description")),
+                                      DataColumn(label: Text("Action")),
+                                    ],
+                                    rows: chooseBudgetCodes.map((budgetCode) {
+                                      final index =
+                                          chooseBudgetCodes.indexOf(budgetCode);
+                                      return DataRow(cells: [
+                                        DataCell(
+                                            Text(budgetCode['Budget Code'])),
+                                        DataCell(
+                                            Text(budgetCode['Description'])),
+                                        DataCell(IconButton(
+                                            onPressed: () {
+                                              _deleteBudgetCode(index);
+                                            },
+                                            icon: const Icon(Icons.delete)))
+                                      ]);
+                                    }).toList(),
+                                  ),
+                                ),
+                              )
                             ],
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Enter Total Amount";
-                              }
-                              final amount = double.tryParse(value);
-                              if (amount == null) {
-                                return "Enter a valid amount";
-                              }
-                              if (amount <= 0) {
-                                return "Your Request Amount must be greater than 0";
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: DropdownButtonFormField(
-                            decoration: const InputDecoration(),
-                            value: _selectedCurrency,
-                            items: ['MMK', 'USD'].map((Currency) {
-                              return DropdownMenuItem(
-                                  value: Currency, child: Text(Currency));
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCurrency = value!;
-                              });
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: TextFormField(
-                            controller: dateController,
-                            decoration: const InputDecoration(
-                                labelText: "Request Date"),
-                            readOnly: true,
-                          ),
-                        ),
-                        ListTile(
-                          title: DropdownButtonFormField(
-                            decoration: const InputDecoration(
-                              labelText: "Choose your Department",
-                            ),
-                            value: _selectedDepartment,
-                            items: departments.map((String department) {
-                              return DropdownMenuItem(
-                                  value: department, child: Text(department));
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedDepartment = value!;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Choose your Department";
-                              }
-                              return null;
-                            },
                           ),
                         ),
                         Row(
@@ -1334,67 +1643,94 @@ class _AdvancedSearchDialogState extends State<AdvancedSearchDialog> {
   }
 }
 
+
+
+
+
+
 class ProjectDetailPage extends StatefulWidget {
   final Map<String, dynamic> projectData;
- 
-  ProjectDetailPage(this.projectData, {super.key});
+  final List<Map<String, dynamic>> selectedBudgetCodes;
+  final String selectedBudgetCode;
+  final List<Map<String, dynamic>> budgetDetails;
+
+  const ProjectDetailPage(
+      {super.key,
+      required this.projectData,
+      required this.selectedBudgetCodes,
+      required this.selectedBudgetCode,
+      required this.budgetDetails});
 
   @override
-  State<ProjectDetailPage> createState() => _ProjectDetailPageState();
+  State<ProjectDetailPage> createState() => _ProjectDetailState();
 }
 
-class _ProjectDetailPageState extends State<ProjectDetailPage> {
+class _ProjectDetailState extends State<ProjectDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Map<String, String>> budgetDetails = [];
+    if (widget.projectData["BudgetDetails"] != null) {
+      if (widget.projectData["BudgetDetails"] is String) {
+        budgetDetails = _parseBudgetDetails(widget.projectData["BudgetDetails"]);
+      } else if (widget.projectData["BudgetDetails"] is List) {
+        budgetDetails =
+            List<Map<String, String>>.from(widget.projectData["BudgetDetails"]);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Project Details Information"),
+        title: const Text("Project Details"),
+        backgroundColor: const Color.fromRGBO(100, 207, 198, 0.855),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildRow(
-                  "ProjectID",
-                  widget.projectData["ProjectID"] ?? "N/A",
-                  "Amount",
-                  widget.projectData["Total Budget Amount"]?.toString() ?? "0"),
-              const SizedBox(height: 10),
-              _buildRow(
-                  "Description",
-                  widget.projectData["Description"]?.toString() ??
-                      "No Description",
-                  "Curency",
-                  widget.projectData["Currency"] ?? "Unknown"),
-              const SizedBox(height: 10),
-              _buildRow("Date", widget.projectData["Date"] ?? "N/A", "Name",
-                  widget.projectData["Name"] ?? "Hsu"),
-              const SizedBox(height: 10),
-              _buildRow("Department", widget.projectData["Department"] ?? "N/A",
-                  "Requestable", widget.projectData["Requestable"] ?? "N/A"),
-              SizedBox(height: 20),
-              Text("Budget Details",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              _buildBudgetTable(),
-              SizedBox(height: 60),
-              Center(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildRow("Project Code", widget.projectData["ProjectID"], "Amount",
+                widget.projectData["Total Budget Amount"]),
+            const SizedBox(height: 10),
+            _buildRow("Description", widget.projectData["Description"], "Currency",
+                widget.projectData["Currency"]),
+            const SizedBox(height: 10),
+            _buildRow("Date", widget.projectData["Date"], "Name",
+                widget.projectData["Name"] ?? 'May'),
+            const SizedBox(height: 10),
+            _buildRow("Department", widget.projectData["Department"], "Requestable",
+                widget.projectData["Requestable"]),
+            const SizedBox(height: 10),
+            const SizedBox(height: 20),
+            const Text("Budget Details",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(
+              height: 40,
+            ),
+            _buildBudgetTable(),
+            const SizedBox(height: 40),
+            Center(
                 child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text("Back")),
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Back"),
+              style: ElevatedButton.styleFrom(
+                textStyle: const TextStyle(
+                  fontSize: 15,
+                ),
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.black,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ],
-          ),
+            )),
+          ],
         ),
       ),
     );
@@ -1420,11 +1756,11 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: RichText(
           text: TextSpan(
-            style: TextStyle(fontSize: 16, color: Colors.black),
+            style: const TextStyle(fontSize: 16, color: Colors.black),
             children: [
               TextSpan(
                   text: "$label: ",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(text: value),
             ],
           ),
@@ -1433,38 +1769,37 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     );
   }
 
-  Widget _buildBudgetTable() {
-    List<Map<String, String>> budgetTable = List<Map<String, String>>.from(
-        widget.projectData["BudgetDetails"] ?? []);
-
-        print("Budget Table Data: $budgetTable");
+Widget _buildBudgetTable() {
     return Table(
       border: TableBorder.all(),
-      columnWidths: {0: FlexColumnWidth(1), 1: FlexColumnWidth(2)},
       children: [
-        TableRow(
-          decoration:
-              BoxDecoration(color: const Color.fromARGB(255, 124, 244, 240)),
+        const TableRow(
+          decoration: BoxDecoration(color: Colors.lightBlueAccent),
           children: [
-            _buildTableCell("Budget Code", isHeader: true),
-            _buildTableCell("Description", isHeader: true),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Budget Code",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Description",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
           ],
         ),
-         if (budgetTable.isEmpty)
-        TableRow(
-          children: [
-            _buildTableCell("N/A"),
-            _buildTableCell("No budget details available"),
-          ],
-        )
-        else
-        for (var row in budgetTable)
-          TableRow(
-            children: [
-              _buildTableCell(row["Budget Code"] ?? ""),
-              _buildTableCell(row["Description"] ?? ""),
-            ],
-          )
+        ...widget.budgetDetails.map((budget) => TableRow(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(budget["Budget Code"]),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(budget["Description"]),
+                ),
+              ],
+            )),
       ],
     );
   }
@@ -1472,7 +1807,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
 
 Widget _buildTableCell(String text, {bool isHeader = false}) {
   return Padding(
-    padding: EdgeInsets.all(8.0),
+    padding: const EdgeInsets.all(8.0),
     child: Text(
       text,
       style: TextStyle(
@@ -1483,11 +1818,25 @@ Widget _buildTableCell(String text, {bool isHeader = false}) {
   );
 }
 
+List<Map<String, String>> _parseBudgetDetails(String budgetDetails) {
+  try {
+    // Replace single quotes with double quotes for JSON parsing
+    String formattedString = budgetDetails.replaceAll("'", '"');
+    // Parse the JSON string into a List of Maps
+    List<dynamic> parsedList = jsonDecode(formattedString);
+    // Convert to List<Map<String, String>>
+    return parsedList.map((item) => Map<String, String>.from(item)).toList();
+  } catch (e) {
+    print("Error parsing BudgetDetails: $e");
+    return [];
+  }
+}
+
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    appBar: AppBar(
-      title: const Text("Project Infomation"),
-    ),
+    // appBar: AppBar(
+    //   title: const Text("Project Infomation"),
+    // ),
   );
 }

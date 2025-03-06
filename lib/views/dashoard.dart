@@ -1,4 +1,5 @@
 
+import 'package:advance_budget_request_system/views/approvalsetup.dart';
 import 'package:advance_budget_request_system/views/budgetamount.dart';
 import 'package:advance_budget_request_system/views/budgetcodeview.dart';
 import 'package:advance_budget_request_system/views/project.dart';
@@ -21,7 +22,7 @@ class _DashboardState extends State<Dashboard>
 
 
   static final List<Widget> _widgetOptions = <Widget>[
-    const Dashboard(),
+    const DashboardView(),
     const Budgetcodeview(),
     Budgetamount(),
   
@@ -30,7 +31,7 @@ class _DashboardState extends State<Dashboard>
     const Center(child: Text("Advance Request")),
     const Center(child: Text("Cash Payment")),
     const Center(child: Text("Settlement")),
-    const Center(child: Text("Approval Setup")),
+    ApprovalSetup(),
   ];
 
   @override
